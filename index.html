@@ -1,0 +1,48 @@
+<html>
+    <head>
+        <script id="vertex-shader" type="x-shader/x-vertex">
+            attribute vec2 aVertexPosition;
+            uniform vec2 uScalingFactor;
+            uniform vec2 uRotationVector;
+
+            void main() {
+                vec2 rotatedPosition = vec2(
+                    aVertexPosition.x * uRotationVector.y +
+                        aVertexPosition.y * uRotationVector.x,
+                    aVertexPosition.y * uRotationVector.y -
+                        aVertexPosition.x * uRotationVector.x
+                );
+                gl_Position = vec4(rotatedPosition * uScalingFactor, 0.0, 1.0);
+            }
+        </script>
+        <script id="fragment-shader" type="x-shader/x-fragment">
+            #ifdef GL_ES
+                precision highp float;
+            #endif
+
+            uniform vec4 uGradientColor1;
+            uniform vec4 uGradientColor2;
+            uniform vec4 uGradientColor3;
+            uniform vec2 uResolution;
+            uniform vec2 uScaleFactor;
+            uniform float uTime;
+
+            void main() {
+                vec2 uv =  gl_FragCoord.xy/uResolution;
+
+                vec4 color1 = mix(uGradientColor3, uGradientColor2, fract((uv.y-sin(uTime))*10.0));
+                vec4 color2 = mix(uGradientColor2, uGradientColor1, uv.x+0.25*cos(uTime));
+                vec4 result = mix(color1, color2, uv.x*sin(uTime+2.0));
+                gl_FragColor = vec4(result.x, result.y, result.z, 1);
+            }
+        </script>
+        <script src="./index.js" type="text/javascript"></script>
+        <link rel="stylesheet" href="./style.css">
+    </head>
+    <body>
+        <canvas id="glcanvas" width="1600" height="900">
+            Oh no! Your browser doesn't support canvas!
+        </canvas>
+        
+    </body>
+</html>
